@@ -8,12 +8,15 @@ namespace BlauesKreuz\AgeVerificationMrz\ViewModel;
 
 use BlauesKreuz\AgeVerificationMrz\Library\Mrz\MrzFormat;
 use BlauesKreuz\AgeVerificationMrz\Library\Mrz\MrzLayout;
+use BlauesKreuz\AgeVerificationMrz\Model\MrzForm;
 use BlauesKreuz\AgeVerificationMrz\Model\Config;
 use BlauesKreuz\AgeVerificationMrz\Model\VerificationManager;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Phrase;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 
@@ -29,6 +32,8 @@ class Verify implements ArgumentInterface
      * @param FormKey $formKey
      * @param UrlInterface $url
      * @param RequestInterface $request
+     * @param CustomerSession $customerSession
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
         private readonly VerificationManager $manager,
@@ -36,18 +41,10 @@ class Verify implements ArgumentInterface
         private readonly CheckoutSession $checkoutSession,
         private readonly FormKey $formKey,
         private readonly UrlInterface $url,
-        private readonly RequestInterface $request
+        private readonly RequestInterface $request,
+        private readonly CustomerSession $customerSession,
+        private readonly TimezoneInterface $timezone
     ) {
-    }
-
-    /**
-     * The document types the customer can choose from, keyed by their form value.
-     *
-     * @return array<string, MrzFormat>
-     */
-    public static function formats(): array
-    {
-        return ['td1' => MrzFormat::TD1, 'td3' => MrzFormat::TD3, 'td2' => MrzFormat::TD2];
     }
 
     /**
@@ -67,7 +64,7 @@ class Verify implements ArgumentInterface
      */
     public function getYouthMessage(): string
     {
-        return $this->config->getYouthMessage((int) $this->checkoutSession->getQuote()->getStoreId());
+        return $this->config->getYouthMessage();
     }
 
     /**
@@ -83,21 +80,49 @@ class Verify implements ArgumentInterface
     /**
      * Where the form is sent to.
      *
+     * @param bool $account whether the form is on the account page (otherwise: before the checkout)
      * @return string
      */
-    public function getPostUrl(): string
+    public function getPostUrl(bool $account = false): string
     {
-        return $this->url->getUrl('agecheck/verify/post');
+        return $this->url->getUrl($account ? 'agecheck/account/post' : 'agecheck/verify/post');
     }
 
     /**
      * Where the customer goes back to.
      *
+     * @param bool $account whether the form is on the account page (otherwise: before the checkout)
      * @return string
      */
-    public function getCartUrl(): string
+    public function getBackUrl(bool $account = false): string
     {
-        return $this->url->getUrl('checkout/cart');
+        return $this->url->getUrl($account ? 'customer/account' : 'checkout/cart');
+    }
+
+    /**
+     * What is known about the age of the logged-in customer, as a sentence.
+     *
+     * @return Phrase
+     */
+    public function getAccountStatus(): Phrase
+    {
+        $status = $this->manager->getCustomerStatus((int) $this->customerSession->getCustomerId());
+        if ($status['age'] === 0) {
+            return __('Your age has not been verified yet.');
+        }
+        if ($status['date'] === null) {
+            return __('Your age has been verified: you can buy products for customers aged %1 or older.', $status['age']);
+        }
+
+        return __(
+            'Your age has been verified: you can buy products for customers aged %1 or older. Last checked on %2.',
+            $status['age'],
+            $this->timezone->formatDateTime(
+                (new \DateTime('@' . $status['date'])),
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::NONE
+            )
+        );
     }
 
     /**
@@ -119,7 +144,7 @@ class Verify implements ArgumentInterface
     {
         $key = (string) $this->request->getParam('document_type', 'td1');
 
-        return isset(self::formats()[$key]) ? $key : 'td1';
+        return isset(MrzForm::formats()[$key]) ? $key : 'td1';
     }
 
     /**
@@ -130,7 +155,7 @@ class Verify implements ArgumentInterface
     public function getTypeOptions(): array
     {
         $options = [];
-        foreach (self::formats() as $key => $format) {
+        foreach (MrzForm::formats() as $key => $format) {
             $options[] = [
                 'value' => $key,
                 'label' => (string) $this->documentLabel($format),
@@ -149,7 +174,7 @@ class Verify implements ArgumentInterface
     public function getCards(): array
     {
         $cards = [];
-        foreach (self::formats() as $key => $format) {
+        foreach (MrzForm::formats() as $key => $format) {
             $segments = MrzLayout::segments($format);
             $ignored = MrzLayout::ignoredLines($format);
             $lines = [];

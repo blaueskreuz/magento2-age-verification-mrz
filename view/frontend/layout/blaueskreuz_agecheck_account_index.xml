@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <head>
+        <css src="BlauesKreuz_AgeVerificationMrz::css/mrz-input.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block name="blaueskreuz.agecheck.account" cacheable="false" template="BlauesKreuz_AgeVerificationMrz::verify.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">BlauesKreuz\AgeVerificationMrz\ViewModel\Verify</argument>
+                    <argument name="account" xsi:type="boolean">true</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

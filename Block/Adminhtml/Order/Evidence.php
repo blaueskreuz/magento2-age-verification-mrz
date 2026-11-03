@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace BlauesKreuz\AgeVerificationMrz\Block\Adminhtml\Order;
 
+use BlauesKreuz\AgeVerificationMrz\Model\EvidenceStatus;
 use BlauesKreuz\AgeVerificationMrz\Model\VerificationMethod;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
@@ -65,22 +66,23 @@ class Evidence extends Template
     }
 
     /**
-     * Whether the order has enough evidence (or the customer was exempt).
+     * Whether the order has enough evidence, is exempt or has none, as a description.
      *
-     * @return bool
+     * @return Phrase|string
      */
-    public function isCovered(): bool
+    public function getStatusLabel(): Phrase|string
     {
         $order = $this->getOrder();
         if ($order === null) {
-            return false;
+            return '';
         }
-        if ($order->getData('mrz_verified_method') === VerificationMethod::Bypass->value) {
-            return true;
-        }
+        $age = $order->getData('mrz_verified_age');
 
-        return $order->getData('mrz_verified_age') !== null
-            && (int) $order->getData('mrz_verified_age') >= $this->getRequiredAge();
+        return EvidenceStatus::fromOrder(
+            $this->getRequiredAge(),
+            $age === null ? null : (int) $age,
+            $order->getData('mrz_verified_method')
+        )->label();
     }
 
     /**

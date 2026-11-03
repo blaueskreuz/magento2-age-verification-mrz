@@ -24,7 +24,7 @@ use Magento\Framework\Escaper;
                 </tr>
                 <tr>
                     <th><?= $escaper->escapeHtml(__('Evidence')) ?></th>
-                    <td><?= $escaper->escapeHtml($block->isCovered() ? __('Verified') : __('No evidence')) ?></td>
+                    <td><?= $escaper->escapeHtml($block->getStatusLabel()) ?></td>
                 </tr>
                 <?php if ($block->getVerifiedAge() !== ''): ?>
                     <tr>

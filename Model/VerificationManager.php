@@ -141,17 +141,65 @@ class VerificationManager
             $this->cartRepository->save($quote);
         }
         if ($quote->getCustomerId()) {
-            $customer = $this->customerRegistry->retrieve((int) $quote->getCustomerId());
-            $known = $this->lowerBound($customer->getData('mrz_verified_age'), $customer->getData('mrz_verified_date'));
-            if ($age >= $known) {
-                $customer->setData('mrz_verified_age', $age);
-                $customer->setData('mrz_verified_date', $now->getTimestamp());
-                $customer->setData('mrz_verified_method', $method->value);
-                foreach (['mrz_verified_age', 'mrz_verified_date', 'mrz_verified_method'] as $code) {
-                    $this->customerResource->saveAttribute($customer, $code);
-                }
-            }
+            $this->recordForCustomer((int) $quote->getCustomerId(), $age, $method);
         }
+    }
+
+    /**
+     * Records a verified age on the account of a customer. An age is only replaced by one that is at least as
+     * strong.
+     *
+     * @param int $customerId
+     * @param int $age
+     * @param VerificationMethod $method
+     * @return bool whether the age was saved (false: the account already holds a higher age)
+     */
+    public function recordForCustomer(int $customerId, int $age, VerificationMethod $method): bool
+    {
+        $customer = $this->customerRegistry->retrieve($customerId);
+        $known = $this->lowerBound($customer->getData('mrz_verified_age'), $customer->getData('mrz_verified_date'));
+        if ($age < $known) {
+            return false;
+        }
+        $customer->setData('mrz_verified_age', $age);
+        $customer->setData('mrz_verified_date', $this->now()->getTimestamp());
+        $customer->setData('mrz_verified_method', $method->value);
+        foreach (['mrz_verified_age', 'mrz_verified_date', 'mrz_verified_method'] as $code) {
+            $this->customerResource->saveAttribute($customer, $code);
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks an MRZ and, if it is valid, records the age on the account of a customer (no cart needed).
+     *
+     * @param int $customerId
+     * @param string $mrz
+     * @param VerificationMethod $method
+     * @return array{result: MrzResult, saved: bool}
+     */
+    public function verifyForCustomer(int $customerId, string $mrz, VerificationMethod $method): array
+    {
+        $result = $this->validator->validate($mrz, $this->now());
+        $saved = $result->isValid() && $this->recordForCustomer($customerId, (int) $result->getAge(), $method);
+
+        return ['result' => $result, 'saved' => $saved];
+    }
+
+    /**
+     * What is known about the age of a customer: the age they are at least today, and when it was verified.
+     *
+     * @param int $customerId
+     * @return array{age: int, date: ?int}
+     */
+    public function getCustomerStatus(int $customerId): array
+    {
+        $customer = $this->customerRegistry->retrieve($customerId);
+        $age = $this->lowerBound($customer->getData('mrz_verified_age'), $customer->getData('mrz_verified_date'));
+        $date = $customer->getData('mrz_verified_date');
+
+        return ['age' => $age, 'date' => $age > 0 && $date !== null && $date !== '' ? (int) $date : null];
     }
 
     /**

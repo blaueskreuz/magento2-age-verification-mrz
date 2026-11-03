@@ -1,0 +1,85 @@
+<?php
+/**
+ * Copyright © Blaues Kreuz. Licensed under GPL-2.0-or-later.
+ */
+declare(strict_types=1);
+
+use BlauesKreuz\AgeVerificationMrz\Block\Adminhtml\Report\Evidence;
+use Magento\Framework\Escaper;
+
+/** @var Evidence $block */
+/** @var Escaper $escaper */
+$filters = $block->getFilters();
+?>
+<form class="admin__form-field" action="<?= $escaper->escapeUrl($block->getFilterUrl()) ?>" method="get">
+    <fieldset class="admin__fieldset">
+        <div class="admin__field">
+            <label class="admin__field-label" for="bk-report-from"><span><?= $escaper->escapeHtml(__('From')) ?></span></label>
+            <div class="admin__field-control">
+                <input type="date" id="bk-report-from" name="from" class="admin__control-text"
+                       value="<?= $escaper->escapeHtmlAttr($filters['from']) ?>">
+            </div>
+        </div>
+        <div class="admin__field">
+            <label class="admin__field-label" for="bk-report-to"><span><?= $escaper->escapeHtml(__('To')) ?></span></label>
+            <div class="admin__field-control">
+                <input type="date" id="bk-report-to" name="to" class="admin__control-text"
+                       value="<?= $escaper->escapeHtmlAttr($filters['to']) ?>">
+            </div>
+        </div>
+        <div class="admin__field admin__field-option">
+            <input type="checkbox" id="bk-report-missing" name="only_missing" value="1" class="admin__control-checkbox"
+                <?= $filters['only_missing'] !== '' ? 'checked' : '' ?>>
+            <label class="admin__field-label" for="bk-report-missing"><?= $escaper->escapeHtml(__('Only orders without enough evidence')) ?></label>
+        </div>
+        <div class="admin__field">
+            <button type="submit" class="action-default scalable"><span><?= $escaper->escapeHtml(__('Apply filter')) ?></span></button>
+            <a class="action-default scalable" href="<?= $escaper->escapeUrl($block->getExportUrl()) ?>"><span><?= $escaper->escapeHtml(__('Download CSV')) ?></span></a>
+        </div>
+    </fieldset>
+</form>
+
+<p><?= $escaper->escapeHtml(__('Only placed orders are listed. The evidence is written on the order when it is placed.')) ?></p>
+<p><strong><?= (int) $block->getTotal() ?></strong> <?= $escaper->escapeHtml(__('orders')) ?></p>
+
+<div class="admin__data-grid-wrap admin__data-grid-wrap-static">
+    <table class="data-grid">
+        <thead>
+        <tr>
+            <?php foreach ($block->getHeadings() as $heading): ?>
+                <th class="data-grid-th"><span class="data-grid-cell-content"><?= $escaper->escapeHtml($heading) ?></span></th>
+            <?php endforeach; ?>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($block->getRows() as $row): ?>
+            <tr<?= $row['missing'] ? ' class="bk-report-missing"' : '' ?>>
+                <?php foreach ($row['cells'] as $index => $cell): ?>
+                    <td>
+                        <?php if ($index === 0): ?>
+                            <a href="<?= $escaper->escapeUrl($row['url']) ?>"><?= $escaper->escapeHtml($cell) ?></a>
+                        <?php else: ?>
+                            <?= $escaper->escapeHtml($cell) ?>
+                        <?php endif; ?>
+                    </td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+        <?php if ($block->getTotal() === 0): ?>
+            <tr><td colspan="<?= count($block->getHeadings()) ?>"><?= $escaper->escapeHtml(__('No orders found.')) ?></td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+<?php if ($block->getLastPage() > 1): ?>
+    <p class="bk-report-pager">
+        <?php if ($block->getPage() > 1): ?>
+            <a href="<?= $escaper->escapeUrl($block->getPageUrl($block->getPage() - 1)) ?>"><?= $escaper->escapeHtml(__('Previous')) ?></a>
+        <?php endif; ?>
+        <?= $escaper->escapeHtml(__('Page %1 of %2', $block->getPage(), $block->getLastPage())) ?>
+        <?php if ($block->getPage() < $block->getLastPage()): ?>
+            <a href="<?= $escaper->escapeUrl($block->getPageUrl($block->getPage() + 1)) ?>"><?= $escaper->escapeHtml(__('Next')) ?></a>
+        <?php endif; ?>
+    </p>
+<?php endif; ?>

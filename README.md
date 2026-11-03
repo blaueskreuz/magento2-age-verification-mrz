@@ -40,6 +40,15 @@ own; use Hyvä Checkout, the Luma Fallback Checkout or another checkout.
   proves 18 today).
 - Guests verify on every order. The result is saved on the cart and the order
   only.
+- Optionally, logged-in customers can verify in their account too (page "Age
+  verification" in the customer account), so they are not asked at the
+  checkout. It is off by default; see Configuration.
+- Staff can set or clear the verified age of a customer in the customer form of
+  the admin (field "Verified age" under "Account Information"). It is marked
+  "set by staff", dated now, and only users with the permission "Set the
+  verified age of customers" can change it; for others the field is read-only.
+- A stored age is only replaced by one that is at least as strong, so a younger
+  specimen entered later never lowers the age of an account.
 - Customer groups can be exempted in the settings; their orders record that
   they were exempt.
 - If the cart contains several products, the highest age applies.
@@ -66,19 +75,23 @@ Stores > Configuration > Sales > Age Verification (MRZ):
 2. **Default minimum age.** The default is 0, so that only products that set a
    minimum age are checked.
 3. **Available minimum ages**, for example `16, 18, 21`.
-4. **Customer groups that are never asked.**
-5. **Show youth-protection message** (on by default) and its text. Leave the
+4. **Let customers verify their age in their account** (off by default): adds
+   the page "Age verification" to the customer account. When off, customers are
+   only asked before the checkout.
+5. **Customer groups that are never asked.**
+6. **Show youth-protection message** (on by default) and its text. Leave the
    text empty to use the default, "Together for youth protection!", which is
    shown in the language of the customer (English, German, French and Italian
    are included). A text you enter is shown as it is, in every language. It can
    be set per store view, so that a multilingual shop can word it per language.
-6. Optionally set the attribute **Minimum age** on a product. The list offers
+7. Optionally set the attribute **Minimum age** on a product. The list offers
    the shop default, "No age check" and the available ages. It overrides the
    default, whether higher or lower. For a configurable product, the chosen
    variation overrides its parent.
 
-Permissions (System > Permissions > User Roles): the settings and viewing the
-evidence of orders have their own resources.
+Permissions (System > Permissions > User Roles): the settings, viewing the
+evidence of orders (and the report) and setting the verified age of customers
+have their own resources. Give them to the roles that need them.
 
 ## Evidence for the person in charge
 
@@ -91,8 +104,14 @@ order is placed:
   of the customer group.
 
 It is shown in the section "Age verification" on the order page in the admin,
-for users with the resource "View the age verification evidence of orders". The
-evidence holds ages, dates and the method, and nothing from the document. It
+and in a report at Reports > Sales > Age verification, for users with the
+resource "View the age verification evidence of orders". The report lists the
+orders with age-restricted products, can be filtered by period and by "only
+orders without enough evidence", and has a "Download CSV" button for
+spreadsheets (cells that a spreadsheet would read as a formula are protected
+with a leading apostrophe). An order shows "No evidence" if nothing enough was
+recorded, also for customers who were verified earlier and were not asked
+again. The evidence holds ages, dates and the method, and nothing from the document. It
 shows that a code consistent with the age was entered at that time, not that
 the person held the document.
 
@@ -123,6 +142,8 @@ advice.
 - TD1 document numbers longer than 9 characters and documents without an expiry
   date are not supported.
 - Orders created by staff in the admin are not checked.
+- A guest who creates an account at the end of the checkout does not take the
+  age over to the account yet; they verify once on their account.
 
 ## Translations
 

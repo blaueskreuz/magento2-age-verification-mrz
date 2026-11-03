@@ -12,19 +12,26 @@ use Magento\Framework\View\Element\Template;
 /** @var Template $block */
 /** @var Verify $viewModel */
 $viewModel = $block->getData('view_model');
+// On the account page the customer verifies without a cart; before the checkout the cart sets the age.
+$isAccount = (bool) $block->getData('account');
 /** @var \Magento\Framework\Escaper $escaper */
 ?>
 <div class="bk-agecheck">
-    <p><?= $escaper->escapeHtml(__(
-        'The products in your cart are for customers aged %1 or older. Please verify your age with the code on your ID card or passport.',
-        $viewModel->getRequiredAge()
-    )) ?></p>
+    <?php if ($isAccount): ?>
+        <p><?= $escaper->escapeHtml($viewModel->getAccountStatus()) ?></p>
+        <p><?= $escaper->escapeHtml(__('Verify your age here once, and you are not asked again at the checkout for products up to that age.')) ?></p>
+    <?php else: ?>
+        <p><?= $escaper->escapeHtml(__(
+            'The products in your cart are for customers aged %1 or older. Please verify your age with the code on your ID card or passport.',
+            $viewModel->getRequiredAge()
+        )) ?></p>
+    <?php endif; ?>
 
     <?php if ($viewModel->getError() !== ''): ?>
         <div class="bk-agecheck__error" role="alert" data-mrz-error><?= $escaper->escapeHtml($viewModel->getError()) ?></div>
     <?php endif; ?>
 
-    <form class="bk-agecheck__form" action="<?= $escaper->escapeUrl($viewModel->getPostUrl()) ?>" method="post"
+    <form class="bk-agecheck__form" action="<?= $escaper->escapeUrl($viewModel->getPostUrl($isAccount)) ?>" method="post"
           autocomplete="off" data-mrz-form>
         <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($viewModel->getFormKey()) ?>">
 
@@ -82,7 +89,7 @@ $viewModel = $block->getData('view_model');
 
         <div class="bk-agecheck__actions">
             <button type="submit" class="bk-agecheck__button"><?= $escaper->escapeHtml(__('Verify my age')) ?></button>
-            <a class="bk-agecheck__back" href="<?= $escaper->escapeUrl($viewModel->getCartUrl()) ?>"><?= $escaper->escapeHtml(__('Back to the cart')) ?></a>
+            <a class="bk-agecheck__back" href="<?= $escaper->escapeUrl($viewModel->getBackUrl($isAccount)) ?>"><?= $escaper->escapeHtml($isAccount ? __('Back to my account') : __('Back to the cart')) ?></a>
         </div>
     </form>
 </div>
