@@ -191,12 +191,6 @@ class Verify implements ArgumentInterface
                         'length' => $segment->length,
                         'css_class' => $segment->filler ? 'mrz-segment--filler' : 'mrz-segment--blank',
                         'default' => $segment->defaultValue(),
-                        'label' => (string) __(
-                            'Line %1, characters %2 to %3',
-                            $line + 1,
-                            $segment->start + 1,
-                            $segment->start + $segment->length
-                        ),
                     ];
                 }
                 $lines[] = [

@@ -70,7 +70,6 @@ $isAccount = (bool) $block->getData('account');
                                        style="--mrz-length: <?= (int) $blank['length'] ?>;"
                                        data-mrz-line="<?= (int) $blank['line'] ?>"
                                        data-mrz-start="<?= (int) $blank['start'] ?>"
-                                       aria-label="<?= $escaper->escapeHtmlAttr($blank['label']) ?>"
                                        autocomplete="off" autocapitalize="characters" spellcheck="false"
                                        data-lpignore="true" data-1p-ignore="true" data-bwignore="true">
                             <?php endforeach; ?>
