@@ -1,0 +1,17 @@
+{
+    "quote": {
+        "column": {
+            "mrz_verified_age": true,
+            "mrz_verified_date": true,
+            "mrz_verified_method": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "mrz_required_age": true,
+            "mrz_verified_age": true,
+            "mrz_verified_date": true,
+            "mrz_verified_method": true
+        }
+    }
+}

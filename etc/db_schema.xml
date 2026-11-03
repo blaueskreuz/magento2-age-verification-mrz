@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="quote" resource="checkout">
+        <column xsi:type="smallint" name="mrz_verified_age" unsigned="true" nullable="true" comment="Age verified from an ID document"/>
+        <column xsi:type="int" name="mrz_verified_date" unsigned="true" nullable="true" comment="When the age was verified (timestamp)"/>
+        <column xsi:type="varchar" name="mrz_verified_method" nullable="true" length="32" comment="How the age was verified"/>
+    </table>
+    <table name="sales_order" resource="sales">
+        <column xsi:type="smallint" name="mrz_required_age" unsigned="true" nullable="true" comment="Age required by the order"/>
+        <column xsi:type="smallint" name="mrz_verified_age" unsigned="true" nullable="true" comment="Age verified from an ID document"/>
+        <column xsi:type="int" name="mrz_verified_date" unsigned="true" nullable="true" comment="When the age was verified (timestamp)"/>
+        <column xsi:type="varchar" name="mrz_verified_method" nullable="true" length="32" comment="How the age was verified"/>
+    </table>
+</schema>

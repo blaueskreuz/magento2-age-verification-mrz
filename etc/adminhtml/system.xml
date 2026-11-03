@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="blaueskreuz_age_verification" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>Age Verification (MRZ)</label>
+            <tab>sales</tab>
+            <resource>BlauesKreuz_AgeVerificationMrz::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1">
+                    <label>Enable age verification</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When disabled, customers are never asked to verify their age.</comment>
+                </field>
+                <field id="default_minimum_age" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1">
+                    <label>Default minimum age</label>
+                    <validate>validate-digits validate-digits-range digits-range-0-99</validate>
+                    <comment>The age customers must have to buy products that do not set their own minimum age. Enter 0 to require no age by default, so that only products with a minimum age are checked.</comment>
+                </field>
+                <field id="allowed_ages" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1">
+                    <label>Available minimum ages</label>
+                    <backend_model>BlauesKreuz\AgeVerificationMrz\Model\Config\Backend\AllowedAges</backend_model>
+                    <comment>The ages offered in the "Minimum age" list of products, separated by commas, for example 16, 18, 21. "No age check" and the default are always offered.</comment>
+                </field>
+                <field id="allow_account_verification" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1">
+                    <label>Let customers verify their age in their account</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Adds an "Age verification" page to the customer account, so customers can verify before they buy. When off, customers are only asked before the checkout.</comment>
+                </field>
+                <field id="exempt_customer_groups" translate="label comment" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1">
+                    <label>Customer groups that are never asked</label>
+                    <source_model>Magento\Customer\Model\Config\Source\Group\Multiselect</source_model>
+                    <comment>Customers in these groups can buy age-restricted products without a check. Orders record that they were exempt.</comment>
+                </field>
+                <field id="show_youth_message" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show youth-protection message</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Shows a short message on the age verification page, below the privacy note.</comment>
+                </field>
+                <field id="youth_message" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Youth-protection message</label>
+                    <validate>validate-length maximum-length-255</validate>
+                    <comment>Shown below the privacy note on the age verification page. Leave empty to use the default text, "Together for youth protection!", which is translated into the language of the customer. A text you enter here is shown as it is.</comment>
+                    <depends>
+                        <field id="show_youth_message">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="support" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Support</label>
+                <field id="donation" type="note" sortOrder="10" showInDefault="1">
+                    <frontend_model>BlauesKreuz\AgeVerificationMrz\Block\Adminhtml\System\Config\Donation</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

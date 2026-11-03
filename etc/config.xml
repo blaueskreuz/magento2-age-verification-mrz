@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <blaueskreuz_age_verification>
+            <general>
+                <enabled>1</enabled>
+                <default_minimum_age>0</default_minimum_age>
+                <allowed_ages>16,18,21</allowed_ages>
+                <allow_account_verification>0</allow_account_verification>
+                <exempt_customer_groups></exempt_customer_groups>
+                <show_youth_message>1</show_youth_message>
+                <youth_message></youth_message>
+            </general>
+        </blaueskreuz_age_verification>
+    </default>
+</config>

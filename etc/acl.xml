@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="BlauesKreuz_AgeVerificationMrz::config" title="Age Verification (MRZ)" translate="title" sortOrder="150"/>
+                        </resource>
+                    </resource>
+                </resource>
+                <resource id="Magento_Customer::customer">
+                    <resource id="BlauesKreuz_AgeVerificationMrz::set_customer_age" title="Set the verified age of customers" translate="title" sortOrder="150"/>
+                </resource>
+                <resource id="Magento_Sales::sales">
+                    <resource id="BlauesKreuz_AgeVerificationMrz::view_evidence" title="View the age verification evidence of orders" translate="title" sortOrder="150"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

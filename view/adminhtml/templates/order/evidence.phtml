@@ -1,0 +1,49 @@
+<?php
+/**
+ * Copyright © Blaues Kreuz. Licensed under GPL-2.0-or-later.
+ */
+declare(strict_types=1);
+
+use BlauesKreuz\AgeVerificationMrz\Block\Adminhtml\Order\Evidence;
+use Magento\Framework\Escaper;
+
+/** @var Evidence $block */
+/** @var Escaper $escaper */
+?>
+<?php if ($block->hasEvidence()): ?>
+    <section class="admin__page-section order-age-verification">
+        <div class="admin__page-section-title">
+            <span class="title"><?= $escaper->escapeHtml(__('Age verification')) ?></span>
+        </div>
+        <div class="admin__page-section-content">
+            <table class="admin__table-secondary">
+                <tbody>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Age required by the products')) ?></th>
+                    <td><?= (int) $block->getRequiredAge() ?></td>
+                </tr>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Evidence')) ?></th>
+                    <td><?= $escaper->escapeHtml($block->isCovered() ? __('Verified') : __('No evidence')) ?></td>
+                </tr>
+                <?php if ($block->getVerifiedAge() !== ''): ?>
+                    <tr>
+                        <th><?= $escaper->escapeHtml(__('Verified for age')) ?></th>
+                        <td><?= $escaper->escapeHtml($block->getVerifiedAge()) ?></td>
+                    </tr>
+                    <tr>
+                        <th><?= $escaper->escapeHtml(__('Verified on')) ?></th>
+                        <td><?= $escaper->escapeHtml($block->getVerifiedDate()) ?></td>
+                    </tr>
+                <?php endif; ?>
+                <?php if ((string) $block->getMethodLabel() !== ''): ?>
+                    <tr>
+                        <th><?= $escaper->escapeHtml(__('How')) ?></th>
+                        <td><?= $escaper->escapeHtml($block->getMethodLabel()) ?></td>
+                    </tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+<?php endif; ?>

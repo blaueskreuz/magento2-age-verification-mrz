@@ -1,0 +1,89 @@
+<?php
+/**
+ * Copyright © Blaues Kreuz. Licensed under GPL-2.0-or-later.
+ *
+ * The "Verify your age" page. Plain HTML, CSS and JavaScript: it needs neither Knockout (Luma) nor Alpine (Hyvä).
+ */
+declare(strict_types=1);
+
+use BlauesKreuz\AgeVerificationMrz\ViewModel\Verify;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Verify $viewModel */
+$viewModel = $block->getData('view_model');
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<div class="bk-agecheck">
+    <p><?= $escaper->escapeHtml(__(
+        'The products in your cart are for customers aged %1 or older. Please verify your age with the code on your ID card or passport.',
+        $viewModel->getRequiredAge()
+    )) ?></p>
+
+    <?php if ($viewModel->getError() !== ''): ?>
+        <div class="bk-agecheck__error" role="alert" data-mrz-error><?= $escaper->escapeHtml($viewModel->getError()) ?></div>
+    <?php endif; ?>
+
+    <form class="bk-agecheck__form" action="<?= $escaper->escapeUrl($viewModel->getPostUrl()) ?>" method="post"
+          autocomplete="off" data-mrz-form>
+        <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($viewModel->getFormKey()) ?>">
+
+        <label class="bk-agecheck__label" for="bk-document-type"><?= $escaper->escapeHtml(__('Type of document')) ?></label>
+        <select id="bk-document-type" name="document_type" class="bk-agecheck__select" data-mrz-type>
+            <?php foreach ($viewModel->getTypeOptions() as $option): ?>
+                <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"<?= $option['selected'] ? ' selected' : '' ?>>
+                    <?= $escaper->escapeHtml($option['label']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <?php foreach ($viewModel->getCards() as $card): ?>
+            <div class="mrz-card mrz-card--<?= $escaper->escapeHtmlAttr($card['key']) ?>"
+                 data-mrz-card="<?= $escaper->escapeHtmlAttr($card['key']) ?>"
+                 data-mrz-line-count="<?= (int) $card['line_count'] ?>"
+                 data-mrz-line-length="<?= (int) $card['line_length'] ?>"
+                 <?= $card['selected'] ? '' : 'hidden' ?>>
+                <div class="mrz-card__head">
+                    <h2><?= $escaper->escapeHtml($card['title']) ?></h2>
+                    <p><?= $escaper->escapeHtml($card['hint']) ?></p>
+                </div>
+                <div class="mrz-card__body">
+                    <?php foreach ($card['lines'] as $line): ?>
+                        <div class="mrz-card__line">
+                            <?php if ($line['sample'] !== ''): ?>
+                                <div class="mrz-card__sample" aria-hidden="true"><?= $escaper->escapeHtml($line['sample']) ?></div>
+                            <?php endif; ?>
+                            <?php foreach ($line['blanks'] as $blank): ?>
+                                <input type="text"
+                                       class="mrz-segment <?= $escaper->escapeHtmlAttr($blank['css_class']) ?>"
+                                       name="<?= $escaper->escapeHtmlAttr($blank['name']) ?>"
+                                       value="<?= $escaper->escapeHtmlAttr($blank['default']) ?>"
+                                       size="<?= (int) $blank['length'] ?>"
+                                       maxlength="<?= (int) $blank['length'] ?>"
+                                       style="--mrz-length: <?= (int) $blank['length'] ?>;"
+                                       data-mrz-line="<?= (int) $blank['line'] ?>"
+                                       data-mrz-start="<?= (int) $blank['start'] ?>"
+                                       aria-label="<?= $escaper->escapeHtmlAttr($blank['label']) ?>"
+                                       autocomplete="off" autocapitalize="characters" spellcheck="false"
+                                       data-lpignore="true" data-1p-ignore="true" data-bwignore="true">
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+
+        <p class="mrz-space-hint"><?= /* @noEscape */ __('Press the space bar to type <code>&lt;</code>.') ?></p>
+        <p><strong><?= $escaper->escapeHtml(__('Privacy:')) ?></strong>
+            <?= $escaper->escapeHtml(__('Your entry is only used to work out your age and is then discarded. It is not stored or logged. Only your age and the date of the check are saved.')) ?></p>
+        <?php if ($viewModel->getYouthMessage() !== ''): ?>
+            <p class="mrz-youth-message"><?= $escaper->escapeHtml($viewModel->getYouthMessage()) ?></p>
+        <?php endif; ?>
+
+        <div class="bk-agecheck__actions">
+            <button type="submit" class="bk-agecheck__button"><?= $escaper->escapeHtml(__('Verify my age')) ?></button>
+            <a class="bk-agecheck__back" href="<?= $escaper->escapeUrl($viewModel->getCartUrl()) ?>"><?= $escaper->escapeHtml(__('Back to the cart')) ?></a>
+        </div>
+    </form>
+</div>
+<script src="<?= $escaper->escapeUrl($block->getViewFileUrl('BlauesKreuz_AgeVerificationMrz::js/mrz-input.js')) ?>"></script>

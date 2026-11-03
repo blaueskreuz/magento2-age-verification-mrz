@@ -1,0 +1,24 @@
+{
+    "name": "blaueskreuz/module-age-verification-mrz",
+    "description": "Verifies the age of customers at checkout from the machine-readable zone (MRZ) of an ID card or passport.",
+    "type": "magento2-module",
+    "license": "GPL-2.0-or-later",
+    "keywords": ["magento2", "adobe commerce", "age verification", "MRZ", "ID card", "passport", "hyva"],
+    "require": {
+        "php": "~8.3.0||~8.4.0",
+        "magento/framework": "^103.0",
+        "magento/module-backend": "^102.0",
+        "magento/module-catalog": "^104.0",
+        "magento/module-checkout": "^100.4",
+        "magento/module-config": "^101.2",
+        "magento/module-customer": "^103.0",
+        "magento/module-eav": "^102.1",
+        "magento/module-quote": "^101.2",
+        "magento/module-sales": "^103.0",
+        "magento/module-store": "^101.1"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": {"BlauesKreuz\\AgeVerificationMrz\\": ""}
+    }
+}

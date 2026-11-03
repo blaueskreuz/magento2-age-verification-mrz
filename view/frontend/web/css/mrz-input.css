@@ -1,0 +1,237 @@
+/**
+ * Styles the guided MRZ input like the back of an ID document.
+ *
+ * Sizes are in px and em, not rem: Luma sets the root font size to 62.5%, which would shrink rem values.
+ * Everything inside the card is border-box, so padding and borders never push a line past its card.
+ */
+
+.mrz-card,
+.mrz-card__head,
+.mrz-card__body,
+.mrz-card__line,
+.mrz-card__sample {
+  box-sizing: border-box;
+}
+
+.mrz-card {
+  --mrz-font-size: 16.8px;
+  width: fit-content;
+  min-width: min(100%, 384px);
+  max-width: 100%;
+  margin: 16px 0;
+  border: 1px solid #c9cfd2;
+  border-radius: 20px;
+  background: #fff;
+  color: #1d1d1d;
+  font-size: 16px;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+.mrz-card[hidden] {
+  display: none;
+}
+
+.mrz-card__head {
+  padding: 20px 28px;
+  background: #f1f4f5;
+}
+
+.mrz-card__head h2 {
+  margin: 0 0 6px;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.mrz-card__head p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.mrz-card__body {
+  padding: 24px 28px 20px;
+  overflow-x: auto;
+}
+
+/* Every line of the MRZ is one bar; the blanks are part of it. */
+.mrz-card .mrz-card__line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: fit-content;
+  min-width: 100%;
+  margin: 0 0 14px;
+  padding: 11px 16px;
+  border: 1px solid #e6df6f;
+  border-radius: 12px;
+  background: #fffb8f;
+  font-family: "OCR-B", ui-monospace, "Courier New", monospace;
+  font-size: var(--mrz-font-size);
+}
+
+.mrz-card .mrz-card__line:focus-within {
+  border-color: #261911;
+  box-shadow: 0 0 0 2px rgba(38, 25, 17, 0.25);
+}
+
+/* The name line has no blanks; it only shows what the document looks like. */
+.mrz-card .mrz-card__line:has(.mrz-card__sample) {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.mrz-card .mrz-card__sample {
+  padding: 0 16px;
+  font-family: "OCR-B", ui-monospace, "Courier New", monospace;
+  font-size: var(--mrz-font-size);
+  white-space: pre;
+  color: #333;
+}
+
+/* Undo the theme's styling of text fields. */
+.mrz-card .mrz-card__line input.mrz-segment {
+  box-sizing: content-box;
+  flex: 0 0 auto;
+  width: calc(var(--mrz-length) * 1ch);
+  min-width: 0;
+  max-width: none;
+  height: 1.5em;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  box-shadow: none;
+  background-color: transparent;
+  color: #1d1d1d;
+  font: inherit;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* A slot for each character to type, like the underscores on the form. */
+.mrz-card .mrz-card__line input.mrz-segment--blank {
+  background-image: linear-gradient(to right, #333 75%, transparent 75%);
+  background-position: 0 1.15em;
+  background-repeat: repeat-x;
+  background-size: calc(100% / var(--mrz-length)) 1px;
+}
+
+.mrz-card .mrz-card__line input.mrz-segment--filler {
+  color: #5f666a;
+}
+
+/* A filler blank that holds real characters looks like the other blanks. */
+.mrz-card .mrz-card__line input.mrz-segment--filler.mrz-segment--data {
+  color: #1d1d1d;
+}
+
+/* No gap below the last line; the card body already has padding. */
+.mrz-card .mrz-card__body > .mrz-card__line:last-child {
+  margin-bottom: 0;
+}
+
+.mrz-space-hint {
+  margin: 8px 0 16px;
+}
+
+/*
+ * Narrow screens: less padding, and the code shrinks so that the longest line (44 characters) fits the form,
+ * whatever margins the theme has. 48px is the space around the line (card border, card and line padding, line
+ * border); 27.5 is characters times their width in em (a little more than 44 x 0.6, to allow for wider fonts).
+ */
+@media (max-width: 640px) {
+  .mrz-card {
+    --mrz-font-size: clamp(9px, calc((100cqw - 48px) / 27.5), 16.8px);
+    border-radius: 14px;
+  }
+
+  .mrz-card__head {
+    padding: 14px 12px;
+  }
+
+  .mrz-card__body {
+    padding: 16px 12px 12px;
+  }
+
+  .mrz-card .mrz-card__line {
+    padding: 8px;
+  }
+
+  .mrz-card .mrz-card__sample {
+    padding: 0 8px;
+  }
+}
+
+.bk-agecheck {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 16px 0 32px;
+}
+
+.bk-agecheck__form {
+  container-type: inline-size;
+}
+
+.bk-agecheck__label {
+  display: block;
+  margin: 16px 0 6px;
+  font-weight: 700;
+}
+
+.bk-agecheck__select {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 384px;
+  height: auto;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid #8d949a;
+  line-height: 1.4;
+  border-radius: 6px;
+  background: #fff;
+  color: #1d1d1d;
+  font: inherit;
+}
+
+.bk-agecheck__error {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border: 1px solid #c2362b;
+  border-radius: 6px;
+  background: #fdecea;
+  color: #7a1f17;
+}
+
+.bk-agecheck__error[hidden] {
+  display: none;
+}
+
+.bk-agecheck__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.bk-agecheck__button {
+  padding: 11px 26px;
+  border: 0;
+  border-radius: 6px;
+  background: #261911;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bk-agecheck__button:hover,
+.bk-agecheck__button:focus-visible {
+  background: #4a3425;
+}
